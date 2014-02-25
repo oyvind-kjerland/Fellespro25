@@ -30,9 +30,11 @@ class Client(object):
                 data = {'request': 'login', 'username': nick}
                 data = json.dumps(data)
                 self.send(data)
-        
-                received_data = self.connection.recv(1024)
-                data = json.loads(received_data)
+                
+                data = self.connection.recv(1024)
+                data = json.loads(data)
+                
+                
         
                 if(data.get('error')):
                         error = data['error']
@@ -42,11 +44,12 @@ class Client(object):
                         elif(error == 'Invalid username'):
                                 print(error)
                         print('Try another')
-                else:
-                        print('Logged in as ' + data['username'])
-                        canLogIn = True
-                        backlog = data['messages']
-                        self.printBacklog(backlog)
+                elif(data.get('response')):
+                        if(data['response'] == 'login'):
+                                print('Logged in as ' + data['username'])
+                                backlog = data['messages']
+                                self.printBacklog(backlog)
+                                canLogIn = True
 
         message = ''
         # Så lenge brukeren ikke skriver exit i meldingsfeltet
@@ -62,7 +65,7 @@ class Client(object):
 
             # Konstruer et JSON objekt som som skal
             # sendes til serveren
-            data = {'nick': nick, 'message': message}
+            data = {'request': 'message', 'message': message}
 
             # Lag en streng av JSON-objektet
             data = json.dumps(data)
@@ -75,7 +78,6 @@ class Client(object):
             received_data = self.connection.recv(1024)
 
             # Si ifra at klienten har mottatt en melding
-            print 'Received from server: ' + received_data
 
     # Lag en metode for å sende en melding til serveren
     def send(self, data):
