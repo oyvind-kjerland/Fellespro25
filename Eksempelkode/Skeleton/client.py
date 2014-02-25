@@ -11,7 +11,8 @@ class Client(object):
 
     def start(self, host, port):
         self.connection.connect((host, port))
-        self.send('Hello')
+        nick = raw_input('Enter your username: ')
+        self.send('Hello ' + nick)
         received_data = self.connection.recv(1024).strip()
         print 'Received from server: ' + received_data
         self.connection.close()
