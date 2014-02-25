@@ -63,7 +63,7 @@ class Client(object):
         # Så lenge brukeren ikke skriver exit i meldingsfeltet
         # vil programmet spørre etter tekst
         while True:
-            message = raw_input('Enter a message (type "exit" to quit): ')
+            message = raw_input("")
 
             # Lukk tilkoblingen hvis brukeren skriver "exit"
             if message == 'exit':

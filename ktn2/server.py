@@ -3,7 +3,7 @@ import SocketServer
 import json
 from datetime import datetime
 
-backlog = ['Hei','heisann']
+backlog = []
 #users = ['admin']
 users = {}
 
