@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import socket
 import json
+from MessageWorker import ReceiveMessageWorker
+import sys
 
 class Client(object):
 
@@ -8,7 +10,7 @@ class Client(object):
         # Initialiser en tilkobling
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
-        
+        self.messageWorker = ReceiveMessageWorker(self, self.connection)
         
         
     def printBacklog(self,backlog):
@@ -19,6 +21,8 @@ class Client(object):
         # Start tilkoblingen
         self.connection.connect((host, port))
 
+		
+		
         # Be brukeren om å skrive inn brukernavn
         
         canLogIn = False
@@ -52,6 +56,10 @@ class Client(object):
                                 canLogIn = True
 
         message = ''
+        
+        # Start MessageWorker
+        self.messageWorker.start()
+
         # Så lenge brukeren ikke skriver exit i meldingsfeltet
         # vil programmet spørre etter tekst
         while True:
@@ -73,17 +81,16 @@ class Client(object):
             # Send meldingen til serveren
             self.send(data)
 
-            # Motta data fra serveren
-            # Setter maks datastørrelse til 1kb
-            received_data = self.connection.recv(1024)
-
-            # Si ifra at klienten har mottatt en melding
-
     # Lag en metode for å sende en melding til serveren
     def send(self, data):
         self.connection.send(data)
 
-
+    def message_received(self, message):
+            data = json.loads(message)
+            print data['message']
+		
+		
+	
 # Kjøres når programmet startes
 if __name__ == "__main__":
     # Definer host og port for serveren

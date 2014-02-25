@@ -4,9 +4,11 @@ import json
 from datetime import datetime
 
 backlog = ['Hei','heisann']
-users = ['admin']
+#users = ['admin']
+users = {}
 
 class CLientHandler(SocketServer.BaseRequestHandler):
+
 
     def send(self, data):
         self.request.send(data)
@@ -40,7 +42,7 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                 if(data['request'] == 'login'):
                         username = data['username']
                         if username not in users:
-                                users.append(username)
+                                users[username] = self.request
                                 nickname = username;
                                 
                                 data = {'response': 'login', 'username': username , 'messages' : backlog}
@@ -64,7 +66,10 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                         
                         data = {'response': 'message',  'message' : message}
                         data = json.dumps(data)
-                        self.send(data)
+                        #self.send(data)
+                        
+                        for username in users:
+                                users[username].sendall(data)
                         
                         
         #self.request.sendall(backlog)
@@ -87,21 +92,24 @@ class CLientHandler(SocketServer.BaseRequestHandler):
 
             # Send en melding til klienten om at meldingen ble mottatt
             #self.request.sendall('Message received')
+            
+
+
 
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-    pass
+	pass
 
 
 # Kjøres når programmet starter
 if __name__ == "__main__":
-    # Definer host og port for serveren
-    HOST = 'localhost'
-    PORT = 9999
+	# Definer host og port for serveren
+	HOST = 'localhost'
+	PORT = 9999
 
-    # Sett opp serveren
-    server = ThreadedTCPServer((HOST, PORT), CLientHandler)
+	# Sett opp serveren
+	server = ThreadedTCPServer((HOST, PORT), CLientHandler)
 
-    # Aktiver serveren. Den vil kjøre til den avsluttes med Ctrl+C
-    server.serve_forever()
+	# Aktiver serveren. Den vil kjøre til den avsluttes med Ctrl+C
+	server.serve_forever()
 
