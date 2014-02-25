@@ -3,17 +3,24 @@ import SocketServer
 import json
 from datetime import datetime
 
+backlog = "Chat backlog: "
+
 class CLientHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
         # Hent IP-adressen til klienten
         self.ip = self.client_address[0]
+        print("New client");
 
         # Hent portnummeret til klienten
         self.port = self.client_address[1]
 
         # Si ifra at en ny klient har koblet til serveren
         print 'Client connected @' + self.ip + ':' + str(self.port)
+        
+        global backlog
+        
+        self.request.sendall(backlog)
 
         while True:
             # Motta data fra klienten
@@ -28,6 +35,8 @@ class CLientHandler(SocketServer.BaseRequestHandler):
 
             # Si ifra at klienten har sendt en melding
             print datetime.now().strftime("%Y-%m-%d %H:%M") + ' ' + data['nick'] + ': ' + data['message']
+            
+            backlog += data['message'] + ", "
 
             # Send en melding til klienten om at meldingen ble mottatt
             self.request.sendall('Message received')
