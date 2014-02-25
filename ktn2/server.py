@@ -4,85 +4,92 @@ import json
 from datetime import datetime
 
 backlog = ['Hei','heisann']
-users = ['admin']
+#users = ['admin']
+users = {}
 
 class CLientHandler(SocketServer.BaseRequestHandler):
 
-    def send(self, data):
-        self.request.send(data)
+	def send(self, data):
+		self.request.send(data)
 
-    def handle(self):
-        # Hent IP-adressen til klienten
-        self.ip = self.client_address[0]
-        
+	def handle(self):
+		# Hent IP-adressen til klienten
+		self.ip = self.client_address[0]
+		
 
-        # Hent portnummeret til klienten
-        self.port = self.client_address[1]
+		# Hent portnummeret til klienten
+		self.port = self.client_address[1]
 
-        # Si ifra at en ny klient har koblet til serveren
-        print 'Client connected @' + self.ip + ':' + str(self.port)
-        
-        canLogIn = False
-        
-        while not canLogIn:
-        
-                data = self.request.recv(1024)
-                data = json.loads(data)
-                global backlog
-        
-                if(data['request'] == 'login'):
-                        username = data['username']
-                        if username not in users:
-                                users.append(username)
-                                data = {'response': 'login', 'username': username , 'messages' : backlog}
-                                data = json.dumps(data)
-                                self.send(data)
-                                print(self.ip + ':' + str(self.port) + " Logged in as: " + username)
-                                canLogIn = True
-                        else:
-                                data = {'response': 'login','error':'Name allready taken!', 'username': username}
-                                data = json.dumps(data)
-                                self.send(data)
-                                print(self.ip + ':' + str(self.port) + " Tried to log in as " + username + ". Username taken")
-                
-                
-                if(data['request'] == 'message'):
-                        
-        #self.request.sendall(backlog)
+		# Si ifra at en ny klient har koblet til serveren
+		print 'Client connected @' + self.ip + ':' + str(self.port)
+		
+		canLogIn = False
+		
+		while not canLogIn:
+		
+				data = self.request.recv(1024)
+				data = json.loads(data)
+				global backlog
+		
+				if(data['request'] == 'login'):
+						username = data['username']
+						if username not in users:
+								#users.append(username)
+								users[username] = self.request
+								data = {'response': 'login', 'username': username , 'messages' : backlog}
+								data = json.dumps(data)
+								self.send(data)
+								print(self.ip + ':' + str(self.port) + " Logged in as: " + username)
+								canLogIn = True
+						else:
+								data = {'response': 'login','error':'Name allready taken!', 'username': username}
+								data = json.dumps(data)
+								self.send(data)
+								print(self.ip + ':' + str(self.port) + " Tried to log in as " + username + ". Username taken")
+				
+				
+				# TODO
+				#if(data['request'] == 'message'):
+				#		
+				
+		#self.request.sendall(backlog)
 
-        while True:
-            # Motta data fra klienten
-            # Setter maks datastørrelse til 1kb
-            data = self.request.recv(1024)
+		while True:
+			# Motta data fra klienten
+			# Setter maks datastørrelse til 1kb
+			data = self.request.recv(1024)
 
-            # Avslutt hvis serveren ikke mottar data fra klienten
-            if not data: break
+			# Avslutt hvis serveren ikke mottar data fra klienten
+			if not data: break
 
-            # Last inn JSON-objektet
-            data = json.loads(data)
+			# Last inn JSON-objektet
+			data = json.loads(data)
 
-            # Si ifra at klienten har sendt en melding
-            print datetime.now().strftime("%Y-%m-%d %H:%M") + ' ' + data['nick'] + ': ' + data['message']
-            
-            backlog += data['message'] + ", "
+			# Si ifra at klienten har sendt en melding
+			print datetime.now().strftime("%Y-%m-%d %H:%M") + ' ' + data['nick'] + ': ' + data['message']
+			
+			backlog += data['message'] + ", "
 
-            # Send en melding til klienten om at meldingen ble mottatt
-            self.request.sendall('Message received')
-
+			# Send en melding til klienten om at meldingen ble mottatt
+			self.request.sendall('Message received')
+			
+			# Send message to all clients
+			for username in users:
+				users[username].sendall(data['message'])
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-    pass
+	pass
 
 
 # Kjøres når programmet starter
 if __name__ == "__main__":
-    # Definer host og port for serveren
-    HOST = 'localhost'
-    PORT = 9999
+	# Definer host og port for serveren
+	HOST = 'localhost'
+	PORT = 9999
 
-    # Sett opp serveren
-    server = ThreadedTCPServer((HOST, PORT), CLientHandler)
+	# Sett opp serveren
+	server = ThreadedTCPServer((HOST, PORT), CLientHandler)
 
-    # Aktiver serveren. Den vil kjøre til den avsluttes med Ctrl+C
-    server.serve_forever()
+	# Aktiver serveren. Den vil kjøre til den avsluttes med Ctrl+C
+	server.serve_forever()
 

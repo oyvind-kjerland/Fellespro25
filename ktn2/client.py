@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import socket
 import json
+from MessageWorker import ReceiveMessageWorker
+import sys, readline
 
 class Client(object):
 
@@ -8,7 +10,7 @@ class Client(object):
         # Initialiser en tilkobling
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
-        
+        self.messageWorker = ReceiveMessageWorker(self, self.connection)
         
         
     def printBacklog(self,backlog):
@@ -19,6 +21,8 @@ class Client(object):
         # Start tilkoblingen
         self.connection.connect((host, port))
 
+		# Start MessageWorker
+		
         # Be brukeren om å skrive inn brukernavn
         
         canLogIn = False
@@ -49,6 +53,9 @@ class Client(object):
                         self.printBacklog(backlog)
 
         message = ''
+
+        self.messageWorker.start()
+
         # Så lenge brukeren ikke skriver exit i meldingsfeltet
         # vil programmet spørre etter tekst
         while True:
@@ -69,19 +76,23 @@ class Client(object):
 
             # Send meldingen til serveren
             self.send(data)
-
-            # Motta data fra serveren
-            # Setter maks datastørrelse til 1kb
-            received_data = self.connection.recv(1024)
-
-            # Si ifra at klienten har mottatt en melding
-            print 'Received from server: ' + received_data
-
+			
+			
     # Lag en metode for å sende en melding til serveren
     def send(self, data):
         self.connection.send(data)
 
-
+    def message_received(self, message):
+		#print message
+		self.printline(message)
+		
+    def printline(self, line):
+		sys.stdout.write('\r'+' '*(len(readline.get_line_buffer())+3)+'\r')
+		print line
+		sys.stdout.write('> ' + readline.get_line_buffer())
+		sys.stdout.flush()
+	
+	
 # Kjøres når programmet startes
 if __name__ == "__main__":
     # Definer host og port for serveren
