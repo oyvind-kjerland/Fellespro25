@@ -30,6 +30,7 @@ class Client(object):
         while not canLogIn:
         
                 nick = raw_input('Enter your username: ')
+                print('')
         
                 data = {'request': 'login', 'username': nick}
                 data = json.dumps(data)
@@ -44,18 +45,25 @@ class Client(object):
                         error = data['error']
                         if(error == 'Name allready taken!'):
                                 print(error)
+                                print('')
                                 
                         elif(error == 'Invalid username'):
                                 print(error)
+                                print('')
                         print('Try another')
                 elif(data.get('response')):
                         if(data['response'] == 'login'):
                                 print('Logged in as ' + data['username'])
                                 backlog = data['messages']
+                                print('')
                                 self.printBacklog(backlog)
+                                print('')
+                                print('Type and press enter to send')
+                                print('')
                                 canLogIn = True
 
         message = ''
+        message2 = nick + ": " 
         
         # Start MessageWorker
         self.messageWorker.start()
@@ -63,7 +71,7 @@ class Client(object):
         # Så lenge brukeren ikke skriver exit i meldingsfeltet
         # vil programmet spørre etter tekst
         while True:
-            message = raw_input("")
+            message = raw_input()
 
             # Lukk tilkoblingen hvis brukeren skriver "exit"
             if message == 'exit':
@@ -80,6 +88,10 @@ class Client(object):
 
             # Send meldingen til serveren
             self.send(data)
+            
+            #CURSOR_UP_ONE = '\x1b[1A'
+            #ERASE_LINE = '\x1b[2K'
+            #print(CURSOR_UP_ONE + ERASE_LINE)
 
     # Lag en metode for å sende en melding til serveren
     def send(self, data):
@@ -87,7 +99,11 @@ class Client(object):
 
     def message_received(self, message):
             data = json.loads(message)
+            #print "\033[A                             \033[A"  
+            
+
             print data['message']
+            
 		
 		
 	
