@@ -104,7 +104,7 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 # Kjøres når programmet starter
 if __name__ == "__main__":
 	# Definer host og port for serveren
-	HOST = 'localhost'
+	HOST = '78.91.38.192'
 	PORT = 9999
 
 	# Sett opp serveren

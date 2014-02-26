@@ -24,7 +24,7 @@ class ReceiveMessageWorker(Thread):
 			data = self.connection.recv(1024)
 			if not data: continue
 			
-			self.listener.message_received(data)
+			self.listener.dataReceived(data)
 			
 			
 			
