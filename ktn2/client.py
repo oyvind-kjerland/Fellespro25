@@ -29,23 +29,18 @@ class Client(object):
 		self.messageWorker.start()
 
 
-	def logout(self):
-		# Så lenge brukeren ikke skriver exit i meldingsfeltet
-		# vil programmet spørre etter tekst
-		while True:
-			message = raw_input("")
 
-			# Lukk tilkoblingen hvis brukeren skriver "exit"
-			if message == 'exit':
-				self.send(json.dumps({'nick': nick, 'message': 'I\'m leaving. Goodbye!'}))
-				self.connection.close()
-				break
-
-			
-
+		
 	def isLoggedIn(self):
 		return self.loggedIn
 	
+	def checkMessage(self,message):
+	        if message == 'logout':
+	                data = {'request': 'logout'}
+        		data = json.dumps(data)
+        		self.send(data)
+        	else:
+        	        self.sendMessage(message)
 	
 	def sendMessage(self, message):
 		# Konstruer et JSON objekt som som skal
@@ -82,6 +77,18 @@ class Client(object):
 			if(data.get('response')):
 				if(data['response'] == 'message'):
 					self.listener.addMessage(data['message'])
+		
+                		elif(data['response'] == 'logout'):
+                                        
+                                        #Stopper alt
+                			self.loggedIn = False;
+                			self.listener.shutDown()
+                			self.messageWorker.shutdown()
+                			self.connection.close()
+                			self.listener.addMessage('You logged out')
+                			sys.exit()
+                			
+                                        
 			
 	def login(self, nick):
 		data = {'request': 'login', 'username': nick}

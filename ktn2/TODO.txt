@@ -1,0 +1,4 @@
+-Chat backlog fungerer ikke
+- norske tegn
+- logout
+- Sjekk at brukernavn har godkjente tegn

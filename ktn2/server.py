@@ -8,7 +8,9 @@ backlog = []
 users = {}
 
 class CLientHandler(SocketServer.BaseRequestHandler):
-
+        
+    def isUserLoggedIn(self,nickname):
+            return nickname in users
 
     def send(self, data):
         self.request.send(data)
@@ -41,7 +43,7 @@ class CLientHandler(SocketServer.BaseRequestHandler):
         
                 if(data['request'] == 'login'):
                         username = data['username']
-                        if username not in users:
+                        if not self.isUserLoggedIn(username):
                                 users[username] = self.request
                                 nickname = username;
                                 
@@ -49,7 +51,10 @@ class CLientHandler(SocketServer.BaseRequestHandler):
 
                                 data = json.dumps(data)
                                 self.send(data)
-                                print(self.ip + ':' + str(self.port) + " Logged in as: " + username)
+                                print(datetime.now().strftime("%Y-%m-%d %H:%M") + ' : '+self.ip + ':' + str(self.port) + ' Logged in as: ' + username)
+                                
+                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' : ' + username + ' logged in '
+                                backlog.append(message)
                                 
                                 
                         else:
@@ -59,39 +64,45 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                                 print(self.ip + ':' + str(self.port) + " Tried to log in as " + username + ". Username taken")
                 
                 
+                elif(data['request'] == 'logout'):
+                        if self.isUserLoggedIn(nickname):
+                                
+                                data = {'response': 'logout', 'username': username}
+                                data = json.dumps(data)
+                                self.send(data)
+                                
+                                del users[username]
+                                
+                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' : User ' + nickname + ' logged out '
+                                print message
+                                backlog.append(message)
+                                
+                                data = {'response': 'message',  'message' : message}
+                                data = json.dumps(data)
+                        
+                                for username in users:
+                                        users[username].sendall(data)
+                                
+                                break;
+                
                 elif(data['request'] == 'message'):
-                        message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' ' + nickname + ': ' + data['message']
-                        print message
-                        backlog.append(message)
+                        if self.isUserLoggedIn(nickname):
+                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' :  ' + nickname + ': ' + data['message']
+                                print message
+                                backlog.append(message)
                         
-                        data = {'response': 'message',  'message' : message}
-                        data = json.dumps(data)
-                        #self.send(data)
+                                data = {'response': 'message',  'message' : message}
+                                data = json.dumps(data)
+                                #self.send(data)
                         
-                        for username in users:
-                                users[username].sendall(data)
+                                for username in users:
+                                        users[username].sendall(data)
                         
-                        
-        #self.request.sendall(backlog)
+                        else:
+                                 print(self.ip + ':' + str(self.port) + " Not logged in. Tried to send: " + message)
+                                 data = {'response': 'message',  'error' : 'You are not logged in!'}
+                                 data = json.dumps(data)
 
-        while True:
-            # Motta data fra klienten
-            # Setter maks datastørrelse til 1kb
-            data = self.request.recv(1024)
-
-            # Avslutt hvis serveren ikke mottar data fra klienten
-            if not data: break
-
-            # Last inn JSON-objektet
-            data = json.loads(data)
-
-            # Si ifra at klienten har sendt en melding
-            print datetime.now().strftime("%Y-%m-%d %H:%M") + ' ' + data['nick'] + ': ' + data['message']
-            
-            backlog += data['message'] + ", "
-
-            # Send en melding til klienten om at meldingen ble mottatt
-            #self.request.sendall('Message received')
             
 
 
@@ -104,7 +115,8 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 # Kjøres når programmet starter
 if __name__ == "__main__":
 	# Definer host og port for serveren
-	HOST = '78.91.38.192'
+	#HOST = '78.91.38.192'
+	HOST = 'localhost'
 	PORT = 9999
 
 	# Sett opp serveren

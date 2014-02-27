@@ -3,11 +3,13 @@ from curses import wrapper
 from client import Client
 from threading import Lock
 import time
+import sys
 
 class ChatInterface:
 
 	def __init__(self):
-		HOST = '78.91.38.192'
+		#HOST = '78.91.38.192'
+		HOST = 'localhost'
 		PORT = 9999
 
 		# Initialiser klienten
@@ -23,11 +25,17 @@ class ChatInterface:
 		self.queueLock = Lock()
 		self.stdscr = None
 		
+		self.isRunning = True
+		
 		
 		
 		wrapper(self.main)
 		
-		
+	def shutDown(self):
+	        self.isRunning = False
+	        curses.nocbreak()
+	        self.stdscr.keypad(0)
+	        curses.echo()
 		
 	def main(self, stdscr):
 		# Clear screen
@@ -35,15 +43,18 @@ class ChatInterface:
 		stdscr.clear()
 		curses.echo()
 		
-		while True:
+		while self.isRunning:
 			if self.client.isLoggedIn():
 				
 				stdscr.clear()
 				self.showMessages()
 				stdscr.addstr(self.queueSize,0,"---------------")
 				stdscr.addstr(self.queueSize+1,0,"Input message: ")
+				if(not self.isRunning): 
+				        break
 				message = stdscr.getstr()
-				self.client.sendMessage(message)
+				self.client.checkMessage(message)
+				stdscr.refresh()
 			
 			# Client is not logged in, ask for login
 			else:
@@ -58,6 +69,7 @@ class ChatInterface:
 				self.stdscr.refresh()
 				time.sleep(self.loginDelay)
 				
+			
 		stdscr.refresh()
 
 	

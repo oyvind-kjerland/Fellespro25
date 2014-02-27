@@ -8,6 +8,8 @@ from threading import Thread
 
 
 class ReceiveMessageWorker(Thread):
+        
+        
 
 	def __init__(self, listener, connection):
 		# Initialize super class
@@ -15,12 +17,17 @@ class ReceiveMessageWorker(Thread):
 		
 		# Set thread as daemon to make python shut down properly on exit
 		self.daemeon = True
+		self.isRunning = True
 		
 		self.listener = listener
 		self.connection = connection
-		
+	
+	def shutdown(self):
+	        self.isRunning = False
+
+	
 	def run(self):
-		while True:
+		while self.isRunning:
 			data = self.connection.recv(1024)
 			if not data: continue
 			
