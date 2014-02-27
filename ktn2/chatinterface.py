@@ -47,9 +47,10 @@ class ChatInterface:
 			if self.client.isLoggedIn():
 				
 				stdscr.clear()
-				self.showMessages()
-				stdscr.addstr(self.queueSize,0,"---------------")
-				stdscr.addstr(self.queueSize+1,0,"Input message: ")
+				with self.queueLock:
+					self.showMessages()
+					stdscr.addstr(self.queueSize,0,"---------------")
+					stdscr.addstr(self.queueSize+1,0,"Input message: ")
 				if(not self.isRunning): 
 				        break
 				message = stdscr.getstr()
@@ -81,7 +82,7 @@ class ChatInterface:
 			if len(self.messageQueue) == self.queueSize:
 				self.messageQueue.pop(0)
 			self.messageQueue.append(message)
-		self.showMessages()
+			self.showMessages()
 	
 	def showMessages(self):
 		y, x = self.stdscr.getyx()
