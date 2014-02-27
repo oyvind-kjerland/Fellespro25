@@ -70,6 +70,7 @@ class Client(object):
 				if(data['response'] == 'login'):
 					self.listener.addMessage('Logged in as ' + data['username'])
 					self.loggedIn = True
+					self.showBackLog(data['messages'])
 					#backlog = data['messages']
 					#self.printBacklog(backlog)
 					
@@ -88,7 +89,9 @@ class Client(object):
                 			self.listener.addMessage('You logged out')
                 			sys.exit()
                 			
-                                        
+        def showBackLog(self,messages):
+                for message in messages:
+                        self.listener.addMessage(message)
 			
 	def login(self, nick):
 		data = {'request': 'login', 'username': nick}

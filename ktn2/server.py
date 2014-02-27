@@ -56,6 +56,13 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                                 message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' : ' + username + ' logged in '
                                 backlog.append(message)
                                 
+                                data = {'response': 'message',  'message' : message}
+                                data = json.dumps(data)
+                                #self.send(data)
+                        
+                                for username in users:
+                                        users[username].sendall(data)
+                                
                                 
                         else:
                                 data = {'response': 'login','error':'Name allready taken!', 'username': username}
