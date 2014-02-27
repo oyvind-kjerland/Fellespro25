@@ -9,7 +9,7 @@ class ChatInterface:
 
 	def __init__(self):
 		#HOST = '78.91.38.192'
-		HOST = 'localhost'
+		HOST = '78.91.9.70'
 		PORT = 9999
 
 		# Initialiser klienten
@@ -20,11 +20,16 @@ class ChatInterface:
 		self.client.start(HOST, PORT)
 		self.loginDelay = 3
 		
-		self.queueSize = 5
+		self.queueSize = 20
 		self.messageQueue = []
 		self.queueLock = Lock()
-		self.stdscr = None
+		self.stdscr = curses.initscr()
 		
+
+		curses.start_color()
+		curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
+		curses.init_pair(2, curses.COLOR_RED, curses.COLOR_BLACK)
+		curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK)
 		self.isRunning = True
 		
 		
@@ -87,9 +92,21 @@ class ChatInterface:
 	def showMessages(self):
 		y, x = self.stdscr.getyx()
 		for i in xrange(0,len(self.messageQueue)):
+		        lengde = len(self.messageQueue[i])
 			self.stdscr.move(i,0)
 			self.stdscr.clrtoeol()
-			self.stdscr.addstr(i,0,self.messageQueue[i])
+			if("Logged in as " in self.messageQueue[i][0:14]):
+			        self.stdscr.addstr(i,0,self.messageQueue[i], curses.color_pair(3))
+			        continue
+			self.stdscr.addstr(i,0,self.messageQueue[i][0:16], curses.color_pair(2))
+			
+			
+			
+			if("logged in." in self.messageQueue[i]):
+			         self.stdscr.addstr(i,16,self.messageQueue[i][16:lengde], curses.color_pair(1))
+		        else:
+		              self.stdscr.addstr(i,16,self.messageQueue[i][16:lengde])  
+			
 		self.stdscr.move(y,x)
 		self.stdscr.refresh()
 	

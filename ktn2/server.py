@@ -51,10 +51,10 @@ class CLientHandler(SocketServer.BaseRequestHandler):
 
                                 data = json.dumps(data)
                                 self.send(data)
-                                print(datetime.now().strftime("%Y-%m-%d %H:%M") + ' : '+self.ip + ':' + str(self.port) + ' Logged in as: ' + username)
+                                print(datetime.now().strftime("%Y-%m-%d %H:%M") + ' '+self.ip + ':' + str(self.port) + ' Logged in as: ' + username + '. ' + str(len(users)) + ' users online')
                                 
-                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' : ' + username + ' logged in '
-                                backlog.append(message)
+                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' ' + username + ' logged in. ' + str(len(users)) + ' users online'
+                                
                                 
                                 data = {'response': 'message',  'message' : message}
                                 data = json.dumps(data)
@@ -80,7 +80,7 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                                 
                                 del users[username]
                                 
-                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' : User ' + nickname + ' logged out '
+                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' User ' + nickname + ' logged out '
                                 print message
                                 backlog.append(message)
                                 
@@ -90,11 +90,11 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                                 for username in users:
                                         users[username].sendall(data)
                                 
-                                break;
+                                
                 
                 elif(data['request'] == 'message'):
                         if self.isUserLoggedIn(nickname):
-                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' :  ' + nickname + ': ' + data['message']
+                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' ' + nickname + ': ' + data['message']
                                 print message
                                 backlog.append(message)
                         
@@ -123,7 +123,7 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 if __name__ == "__main__":
 	# Definer host og port for serveren
 	#HOST = '78.91.38.192'
-	HOST = 'localhost'
+	HOST = '78.91.9.70'
 	PORT = 9999
 
 	# Sett opp serveren
