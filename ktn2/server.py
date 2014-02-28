@@ -3,14 +3,11 @@ import SocketServer
 import json
 from datetime import datetime
 
-backlog = []
-#users = ['admin']
-users = {}
 
 class CLientHandler(SocketServer.BaseRequestHandler):
         
     def isUserLoggedIn(self,nickname):
-            return nickname in users
+            return nickname in server.users
 
     def send(self, data):
         self.request.send(data)
@@ -37,31 +34,30 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                 if not data: break
                 
                 data = json.loads(data)
-                global backlog
                 
                 if(not data.get('request')): continue
         
                 if(data['request'] == 'login'):
                         username = data['username']
                         if not self.isUserLoggedIn(username):
-                                users[username] = self.request
+                                server.users[username] = self.request
                                 nickname = username;
                                 
-                                data = {'response': 'login', 'username': username , 'messages' : backlog}
+                                data = {'response': 'login', 'username': username , 'messages' : server.backlog}
 
                                 data = json.dumps(data)
                                 self.send(data)
-                                print(datetime.now().strftime("%Y-%m-%d %H:%M") + ' '+self.ip + ':' + str(self.port) + ' Logged in as: ' + username + '. ' + str(len(users)) + ' users online')
+                                print(datetime.now().strftime("%Y-%m-%d %H:%M") + ' '+self.ip + ':' + str(self.port) + ' Logged in as: ' + username + '. ' + str(len(server.users)) + ' users online')
                                 
-                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' ' + username + ' logged in. ' + str(len(users)) + ' users online'
+                                message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' ' + username + ' logged in. ' + str(len(server.users)) + ' users online'
                                 
                                 
                                 data = {'response': 'message',  'message' : message}
                                 data = json.dumps(data)
                                 #self.send(data)
                         
-                                for username in users:
-                                        users[username].sendall(data)
+                                for username in server.users:
+                                        server.users[username].sendall(data)
                                 
                                 
                         else:
@@ -78,17 +74,17 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                                 data = json.dumps(data)
                                 self.send(data)
                                 
-                                del users[username]
+                                del server.users[username]
                                 
                                 message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' User ' + nickname + ' logged out '
                                 print message
-                                backlog.append(message)
+                                server.backlog.append(message)
                                 
                                 data = {'response': 'message',  'message' : message}
                                 data = json.dumps(data)
                         
-                                for username in users:
-                                        users[username].sendall(data)
+                                for username in server.users:
+                                        server.users[username].sendall(data)
                                 
                                 
                 
@@ -96,14 +92,14 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                         if self.isUserLoggedIn(nickname):
                                 message =  datetime.now().strftime("%Y-%m-%d %H:%M") + ' ' + nickname + ': ' + data['message']
                                 print message
-                                backlog.append(message)
+                                server.backlog.append(message)
                         
                                 data = {'response': 'message',  'message' : message}
                                 data = json.dumps(data)
                                 #self.send(data)
                         
-                                for username in users:
-                                        users[username].sendall(data)
+                                for username in server.users:
+                                        server.users[username].sendall(data)
                         
                         else:
                                  print(self.ip + ':' + str(self.port) + " Not logged in. Tried to send: " + message)
@@ -116,19 +112,22 @@ class CLientHandler(SocketServer.BaseRequestHandler):
 
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-	pass
+	def init(self):
+		self.backlog = []
+		self.users = {}
 
 
 # Kjøres når programmet starter
 if __name__ == "__main__":
 	# Definer host og port for serveren
 	#HOST = '78.91.38.192'
-	HOST = '78.91.9.70'
+	HOST = 'localhost'
 	PORT = 9999
 
 	# Sett opp serveren
 	server = ThreadedTCPServer((HOST, PORT), CLientHandler)
-
+	server.init()
+	
 	# Aktiver serveren. Den vil kjøre til den avsluttes med Ctrl+C
 	server.serve_forever()
 

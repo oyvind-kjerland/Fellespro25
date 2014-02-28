@@ -60,7 +60,6 @@ class Client(object):
 
 	def dataReceived(self, data):
 		data = json.loads(data)
-		
 		if not self.loggedIn:
 			if(data.get('error')):
 				error = data['error']
