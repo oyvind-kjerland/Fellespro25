@@ -9,7 +9,8 @@ class ChatInterface:
 
 	def __init__(self):
 		#HOST = '78.91.38.192'
-		HOST = '78.91.9.70'
+		#HOST = '78.91.9.70'
+		HOST = 'localhost'
 		PORT = 9999
 
 		# Initialiser klienten
