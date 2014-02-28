@@ -59,6 +59,7 @@ class Client(object):
 		self.connection.send(data)
 
 	def dataReceived(self, data):
+	        if not data: return
 		data = json.loads(data)
 		
 		if not self.loggedIn:

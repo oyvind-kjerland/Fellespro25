@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import SocketServer
 import json
+import re
 from datetime import datetime
 
 backlog = []
@@ -14,6 +15,10 @@ class CLientHandler(SocketServer.BaseRequestHandler):
 
     def send(self, data):
         self.request.send(data)
+        
+    def isUsernameValid(self,username):
+            return re.match('^[\w-]+$', username)
+            
 
     def handle(self):
         # Hent IP-adressen til klienten
@@ -43,7 +48,9 @@ class CLientHandler(SocketServer.BaseRequestHandler):
         
                 if(data['request'] == 'login'):
                         username = data['username']
-                        if not self.isUserLoggedIn(username):
+                        
+                        
+                        if (not self.isUserLoggedIn(username) and self.isUsernameValid(username)):
                                 users[username] = self.request
                                 nickname = username;
                                 
@@ -62,14 +69,18 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                         
                                 for username in users:
                                         users[username].sendall(data)
+                        elif(not self.isUsernameValid(username)):
+                                data = {'response': 'login','error':'Name not valid!', 'username': username}
+                                data = json.dumps(data)
+                                self.send(data)
+                                print(self.ip + ':' + str(self.port) + " Tried to log in as " + username + ". Username not valid")
                                 
-                                
-                        else:
+                        elif(not self.isUserLoggedIn(username)):
                                 data = {'response': 'login','error':'Name allready taken!', 'username': username}
                                 data = json.dumps(data)
                                 self.send(data)
                                 print(self.ip + ':' + str(self.port) + " Tried to log in as " + username + ". Username taken")
-                
+
                 
                 elif(data['request'] == 'logout'):
                         if self.isUserLoggedIn(nickname):
@@ -88,7 +99,7 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                                 data = json.dumps(data)
                         
                                 for username in users:
-                                        users[username].sendall(data)
+                                        users[username].send(data)
                                 
                                 
                 
@@ -123,7 +134,8 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
 if __name__ == "__main__":
 	# Definer host og port for serveren
 	#HOST = '78.91.38.192'
-	HOST = '78.91.9.70'
+	#HOST = '78.91.9.70'
+	HOST = 'localhost'
 	PORT = 9999
 
 	# Sett opp serveren
