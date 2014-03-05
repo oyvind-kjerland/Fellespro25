@@ -1,3 +1,5 @@
+create schema kalendersystem
+
 create table user (
     username varchar(255) not null,
     password varchar(255) not null,
@@ -6,7 +8,7 @@ create table user (
     mail varchar(255) not null,
     phone char(12) not null,
     primary key (username),
-    foreign key (
+    foreign key ()
     );
 
 create table group (
@@ -33,4 +35,12 @@ create table meetingroom (
 create table notification (
     appointmentID int 
 
+create table participant {
+	username varchar(255) not null,
+	id int not null,
+	status varchar(255),
+	hidden boolean,
+	alarm int,
+	primary key(username, id),
+	}
 
