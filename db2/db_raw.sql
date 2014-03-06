@@ -1,10 +1,12 @@
-create database kalendersystem;
+create database cal;
+
+use cal;
 
 create table user (
     username varchar(15) not null,
     password varchar(45) not null,
     first_name varchar(45) not null,
-    sur_name varchar(45) not null,
+    last_name varchar(45) not null,
     mail varchar(45) not null,
     phone char(12) not null,
     primary key (username)
