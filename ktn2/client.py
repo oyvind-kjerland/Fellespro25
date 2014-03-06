@@ -52,7 +52,8 @@ class Client(object):
 
 		self.send(data)
 	
-	
+	def printDebugMessage(self,message):
+	        self.listener.addMessage(message)
 	
 	# Lag en metode for å sende en melding til serveren
 	def send(self, data):

@@ -25,13 +25,27 @@ class ReceiveMessageWorker(Thread):
 	def shutdown(self):
 	        self.isRunning = False
 
+        def splitAndSendMessage(self,data):
+                array = data.split("} {")
+                if len(array) > 1:
+                        self.listener.printDebugMessage("Masse json filer pa en gang!")
+                for linje in array:
+                        updatedLine = linje
+                        if not linje[0] == '{':
+                                updatedLine = '{' +  updatedLine
+
+                        if not linje[-1] == '}':
+                                updatedLine = updatedLine + '}'
+                        self.listener.dataReceived(updatedLine)
+                
 	
 	def run(self):
 		while self.isRunning:
 			data = self.connection.recv(1024)
 			if not data: continue
 			
-			self.listener.dataReceived(data)
+			self.splitAndSendMessage(data)
+			#self.listener.dataReceived(data)
 			
 			
 			
