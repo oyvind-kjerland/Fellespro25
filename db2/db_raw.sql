@@ -1,4 +1,6 @@
-create database kalendersystem;
+create database cal;
+
+use cal;
 
 create table user (
     username varchar(15) not null,
