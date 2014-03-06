@@ -10,11 +10,11 @@ create table user (
     primary key (username)
     );
 
-create table group (
+create table group_table (
     groupname varchar(15) not null,
     parent_groupname varchar(15),
     primary key (groupname),
-    constraint subgroup foreign key (parent_groupname) references group(groupname)
+    constraint subgroup foreign key (parent_groupname) references group_table(groupname)
     	on update cascade
     );
 
@@ -69,7 +69,7 @@ create table member (
 	constraint member_username foreign key (username) references user(username)
 		on delete cascade
 		on update cascade,
-	constraint member_of_group foreign key (groupname) references group(groupname)
+	constraint member_of_group foreign key (groupname) references group_table(groupname)
 		on delete cascade
 		on update cascade
 	);
