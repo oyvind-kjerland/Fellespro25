@@ -142,7 +142,8 @@ if __name__ == "__main__":
 	# Definer host og port for serveren
 	#HOST = '78.91.38.192'
 
-	HOST = 'localhost'
+	#HOST = 'localhost'
+	HOST = '78.91.8.50'
 	PORT = 9999
 
 	# Sett opp serveren
