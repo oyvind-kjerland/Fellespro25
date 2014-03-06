@@ -26,7 +26,7 @@ class ReceiveMessageWorker(Thread):
 	        self.isRunning = False
 
         def splitAndSendMessage(self,data):
-                array = data.split("} {")
+                array = data.split("}{")
                 if len(array) > 1:
                         self.listener.printDebugMessage("Masse json filer pa en gang!")
                 for linje in array:
