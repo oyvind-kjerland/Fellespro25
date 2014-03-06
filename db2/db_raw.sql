@@ -23,7 +23,7 @@ create table group_table (
 create table meetingroom (
     roomnumber varchar(45) not null,
     capacity int not null,
-    primary key (roomnumber)
+    primary key (roomnumber),
     ); 
 
 create table appointment (
@@ -44,16 +44,33 @@ create table appointment (
     );
 
 create table notification (
-    appointmentID int,
+    id int,
     type varchar(15),
-    description varchar(255)
+    description varchar(255),
+    appointmentId int not null,
+    primary key (id),
+    constraint belonging_to foreign key (appointmentId) references appointment(id)
+        on delete cascade
+        on update cascade
 	);
+
+create table user_notification (
+    notificationId int not null,
+    username varchar(15) not null,
+    primary key (notificationId, username),
+    constraint user_notification_n foreign key (notificationId) references notification(id)
+        on delete cascade
+        on update cascade,
+    constraint user_notification_u foreign key (username) references user(username)
+        on delete cascade
+        on update cascade
+);
 
 create table participant (
 	username varchar(45) not null,
 	id int not null,
 	status varchar(45),
-	hidden boolean,
+	hsidden boolean,
 	alarm int,
 	primary key(username, id),
 	constraint user_participant foreign key (username) references user(username)
