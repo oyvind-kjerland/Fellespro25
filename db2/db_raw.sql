@@ -1,4 +1,4 @@
-create schema kalendersystem;
+create database kalendersystem;
 
 create table user (
     username varchar(15) not null,
@@ -14,7 +14,7 @@ create table group (
     groupname varchar(15) not null,
     parent_groupname varchar(15),
     primary key (groupname),
-    constraint subgroup foreign key parent_groupname references group(groupname)
+    constraint subgroup foreign key (parent_groupname) references group(groupname)
     	on update cascade
     );
 
@@ -25,7 +25,7 @@ create table appointment (
     description varchar(255),
     location varchar(45),
     responsible_username varchar(15) not null,
-    roomnumber varchar(45)
+    roomnumber varchar(45),
     primary key (id),
     constraint reservation foreign key (roomnumber) references meetingroom(roomnumber)
     	on delete cascade
@@ -42,8 +42,8 @@ create table meetingroom (
     );
 
 create table notification (
-    appointmentID int 
-    type varchar(15)
+    appointmentID int,
+    type varchar(15),
     description varchar(255)
 	);
 
@@ -54,10 +54,10 @@ create table participant (
 	hidden boolean,
 	alarm int,
 	primary key(username, id),
-	constraint user_participant foreign key username references user(username)
+	constraint user_participant foreign key (username) references user(username)
 		on delete cascade
 		on update cascade,
-	constraint appointment_participant foreign key id references appointment(id)
+	constraint appointment_participant foreign key (id) references appointment(id)
 		on delete cascade
 		on update cascade
 	);
@@ -66,10 +66,10 @@ create table member (
 	groupname varchar(15) not null,
 	username varchar(15) not null,
 	primary key (groupname, username),
-	constraint member_username foreign key username references user(username)
+	constraint member_username foreign key (username) references user(username)
 		on delete cascade
 		on update cascade,
-	constraint member_of_group foreign key groupname references group(groupname)
+	constraint member_of_group foreign key (groupname) references group(groupname)
 		on delete cascade
 		on update cascade
 	);
