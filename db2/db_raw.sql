@@ -18,6 +18,12 @@ create table group_table (
     	on update cascade
     );
 
+create table meetingroom (
+    roomnumber varchar(45) not null,
+    capacity int not null,
+    primary key (roomnumber)
+    ); 
+
 create table appointment (
     id int not null auto_increment,
     starttime datetime not null,
@@ -33,12 +39,6 @@ create table appointment (
     constraint responsible foreign key (responsible_username) references user(username)
     	on delete cascade
     	on update cascade
-    );
-
-create table meetingroom (
-    roomnumber varchar(45) not null,
-    capacity int not null,
-    primary key (roomnumber)
     );
 
 create table notification (
