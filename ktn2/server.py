@@ -36,6 +36,10 @@ class CLientHandler(SocketServer.BaseRequestHandler):
             server.backlog.append(message)
             
     def checkMessage(self,message):
+            if "} {" in message:
+                    print("User type } {. Message Changed.")
+                    index = message.find("} {") + 1
+                    return message[:index] + ' ' + message[index:]
             return message
            
     def logInUser(self,username):
@@ -118,7 +122,8 @@ class CLientHandler(SocketServer.BaseRequestHandler):
                 #Recive message and send it to all connected users
                 elif(data['request'] == 'message'):
                         if self.isUserLoggedIn(self.username):
-                                self.broadcastMessage(checkMessage(data['message']))
+                                message = self.checkMessage(data['message'])
+                                self.broadcastMessage(message)
                         else:
                                  print(self.ip + ':' + str(self.port) + " Not logged in. Tried to send something" )
                                  data = {'response': 'message',  'error' : 'You are not logged in!'}
