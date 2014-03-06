@@ -25,7 +25,7 @@ create table appointment (
     description varchar(255),
     location varchar(45),
     responsible_username varchar(15) not null,
-    roomnumber varchar(45) not null,
+    roomnumber varchar(45)
     primary key (id),
     constraint reservation foreign key (roomnumber) references meetingroom(roomnumber)
     	on delete cascade
