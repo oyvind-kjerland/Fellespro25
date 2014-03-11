@@ -62,12 +62,13 @@ class Client(object):
 	def dataReceived(self, data):
 	        if not data: return
 		data = json.loads(data)
-		if not self.loggedIn:
-			if(data.get('error')):
-				error = data['error']
-				self.listener.addMessage(error)
-				
-			elif(data.get('response')):
+		
+		if(data.get('error')):
+		        error = data['error']
+			self.listener.addMessage(error)
+		
+		elif not self.loggedIn:	
+			if(data.get('response')):
 				if(data['response'] == 'login'):
 					self.listener.addMessage('Logged in as ' + data['username'])
 					self.loggedIn = True

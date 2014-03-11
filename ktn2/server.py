@@ -18,12 +18,24 @@ class CLientHandler(SocketServer.BaseRequestHandler):
 	    return re.match('^[\w-]+$', username) and len(username) < self.maxUsernameLength
 	   
     def logoutUser(self):
+            if self.username not in server.users:
+                    print "User tried to log out, but not logget in"
+                    data = {'response': 'logout',  'error' : 'You are not logged in!'}
+	            data = json.dumps(data)
+	            self.send(data)
+	            return
+            
+            
 	    data = {'response': 'logout', 'username': self.username}
 	    data = json.dumps(data)
 	    self.send(data)
 	    self.removeUser()
 		
     def removeUser(self):
+            if self.username not in server.users:
+                    print "User tried to log out, but not logget inn"
+                    return
+            
 	    del server.users[self.username]
 	    
 	    message =  self.getDateAndTime() + ' User ' + self.username + ' logged out '
@@ -129,9 +141,10 @@ class CLientHandler(SocketServer.BaseRequestHandler):
 					message = self.checkMessage(data['message'])
 					self.broadcastMessage(message)
 				else:
-					 print(self.ip + ':' + str(self.port) + " Not logged in. Tried to send something" )
+					 print(self.ip + ':' + str(self.port) + " Not logged in. Tried to send: " + data['message'] )
 					 data = {'response': 'message',  'error' : 'You are not logged in!'}
 					 data = json.dumps(data)
+					 self.send(data)
 		except socket.error:
 			print "User disconnected"
 			self.removeUser()
@@ -149,8 +162,8 @@ if __name__ == "__main__":
 	# Definer host og port for serveren
 	#HOST = '78.91.38.192'
 
-	HOST = 'localhost'
-	#HOST = '78.91.8.50'
+	#HOST = 'localhost'
+	HOST = '78.91.10.63'
 	PORT = 9999
 
 	# Sett opp serveren

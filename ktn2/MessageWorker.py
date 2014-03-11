@@ -26,7 +26,7 @@ class ReceiveMessageWorker(Thread):
 	        self.isRunning = False
 
         def splitAndSendMessage(self,data):
-                array = data.split("}{")s
+                array = data.split("}{")
                 for linje in array:
                         updatedLine = linje
                         if not linje[0] == '{':
