@@ -23,7 +23,7 @@ create table group_table (
 create table meetingroom (
     roomnumber varchar(45) not null,
     capacity int not null,
-    primary key (roomnumber),
+    primary key (roomnumber)
     ); 
 
 create table appointment (
